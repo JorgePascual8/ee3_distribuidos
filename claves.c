@@ -51,9 +51,39 @@ void get_value(CLIENT *clnt, int key) {
     }
 }
 
-// Functions for modify, delete, exist would be similar
+void modify_value(CLIENT *clnt, int key, const char *value1, int N_value2, double V_value2[]) {
+    keyvalue_set_args args;
+    args.key = key;
+    strcpy(args.value1, value1);
+    args.N_value2 = N_value2;
+    memcpy(args.V_value2, V_value2, sizeof(double) * N_value2);
+    int *result;
+    result = kv_modify_1(&args, clnt);
+    if (*result != 0) {
+        fprintf(stderr, "Error modifying value\n");
+    }
+}
+
+void delete_key(CLIENT *clnt, int key) {
+    int *result;
+    result = kv_delete_1(&key, clnt);
+    if (*result != 0) {
+        fprintf(stderr, "Error deleting key\n");
+    }
+}
+
+void check_existence(CLIENT *clnt, int key) {
+    int *result;
+    result = kv_exist_1(&key, clnt);
+    if (*result == 1) {
+        printf("Key %d exists.\n", key);
+    } else if (*result == 0) {
+        printf("Key %d does not exist.\n", key);
+    } else {
+        fprintf(stderr, "Error checking existence of key\n");
+    }
+}
 
 void cleanup(CLIENT *clnt) {
     clnt_destroy(clnt);
 }
-
